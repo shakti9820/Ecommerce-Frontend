@@ -100,11 +100,11 @@ function UserNavbar({ setProducts }) {
   }, []);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
+    const userData = (localStorage.getItem('UserType'));
     if (!userData || userData.userType!=='user') {
       navigate("/");
     }
-    if (userData.userType==='user') {
+    if (userData==='user') {
       setIsLoggedIn(true);
     }
   }, []);

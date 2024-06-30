@@ -1,70 +1,55 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import backgroundImg from '../background.png'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import backgroundImg from '../background.png';
 import axios from 'axios';
+import { loginRequest, loginSuccess, loginFailure } from '../redux/action/userAction';
 
 function Login() {
-  const location = useLocation();
-  const userType = location.state ? location.state.userType : null;
-  console.log('User type:', userType);
-   
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {  error } = useSelector((state) => state.user);
 
-  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
+  useEffect(() => {
+    const userType = localStorage.getItem('UserType');
+    const userToken = JSON.parse(localStorage.getItem('token'));
+    if (userToken && userType) {
+      navigate(`/${userType}Home`);
+    }
+  }, [navigate]);
 
-  useEffect(()=>{
-     if(userType==null) navigate("/");
-  },[])
-
-
-  const handleLogin = () => {
-    // Validation logic
+  const handleLogin = async () => {
     if (email.trim() === '' || password.trim() === '') {
-      setError('Email and password are required');
+      dispatch(loginFailure('Email and password are required'));
       return;
     }
 
-    // API call for login
-    axios.post(`${process.env.REACT_APP_API_URL}/${userType}/login`, {
-      username:email,
-      password
-    })
-    .then(response => {
-      // Check if login is successful
-      if (response.data && response.data.id && response.data.username && response.data.name) {
-        // Save user data to localStorage
-        localStorage.setItem('user', JSON.stringify({ ...response.data, userType }));
-        // Redirect to user type home page
-        // console.log(`${userType}home`);
-        navigate(`/${userType}home`);
+    dispatch(loginRequest());
+
+    try {
+      const userType = localStorage.getItem('UserType');
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/${userType}/login`, {
+        username: email,
+        password,
+      });
+      if (response.data) {
+        localStorage.setItem('token', JSON.stringify(response.data));
+        dispatch(loginSuccess(response.data));
+        navigate(`/${userType}Home`);
       } else {
-        setError('Incorrect email or password');
+        dispatch(loginFailure('Incorrect email or password'));
       }
-    })
-    .catch(error => {
-      console.error('Login failed:', error);
-      setError('Login failed. Please try again later.');
-    });
+    } catch (error) {
+      dispatch(loginFailure('Login failed. Please try again later.'));
+    }
   };
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData && userData.id && userData.username && userData.name && userType===userData.userType) {
-      navigate(`/${userType}Home`);
-    }
-  }, [userType, navigate]);
-   
   const handleClick = () => {
-    if(userType === 'admin')
-      navigate('/register', { state: { userType: 'admin' } });
-    else 
-      navigate('/register', { state: { userType: 'user' } });
+    navigate('/register');
   };
 
   return (
@@ -161,6 +146,7 @@ const SignupLink = styled.button`
   text-decoration: underline;
   width: 100%; /* Make the button full width */
 `;
+
 const ErrorMessage = styled.p`
   color: red;
   font-size: 14px;

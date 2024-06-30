@@ -80,7 +80,7 @@ function AdminNavbar() {
 
   useEffect(()=>{
     if(!isLoggedIn){
-      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     navigate('/');
     }
   },[isLoggedIn])
@@ -102,11 +102,12 @@ function AdminNavbar() {
  
   
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (!userData || userData.userType!=='admin') {
+    const userData = JSON.parse(localStorage.getItem('token'));
+    const userType = (localStorage.getItem('UserType'));
+    if (!userData || userType!=='admin') {
       navigate("/");
     }
-    else if (userData.userType==='admin') {
+    else if (userType==='admin') {
       setIsLoggedIn(true);
     }
   }, []);

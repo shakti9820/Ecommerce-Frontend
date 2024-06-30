@@ -5,9 +5,6 @@ import axios from 'axios';
 import backgroundImg from '../background.png'; 
 
 function Signup() {
-  const location = useLocation();
-  const userType = location.state ? location.state.userType : null;
-  console.log('User type:', userType);
 
   const navigate = useNavigate();
 
@@ -40,6 +37,7 @@ function Signup() {
     }
 
     // API call
+    const userType = localStorage.getItem('UserType');
     axios.post(`${process.env.REACT_APP_API_URL}/${userType}/signup`, {
       name,
       username:email,
@@ -48,9 +46,10 @@ function Signup() {
       .then(response => {
         console.log('Signup successful:', response.data);
         // Save user data to local storage
-        localStorage.setItem('user', JSON.stringify({ ...response.data, userType }));
+        // localStorage.setItem('user', JSON.stringify({ ...response.data, userType }));
         // Redirect to user type home page
-        navigate(`/${userType}Home`);
+        // navigate(`/${userType}Home`);
+        navigate('/login');
       })
       .catch(error => {
         alert('Signup failed:', error);
@@ -58,18 +57,28 @@ function Signup() {
       });
   };
    
+  // useEffect(() => {
+  //   const userData = JSON.parse(localStorage.getItem('user'));
+  //   if (userData && userData.id && userData.username && userData.name && userType===userData.userType) {
+  //     navigate(`/${userType}Home`);
+  //   }
+  // }, [userType, navigate]);
+
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData && userData.id && userData.username && userData.name && userType===userData.userType) {
+    const userType = localStorage.getItem('UserType');
+    const userToken = JSON.parse(localStorage.getItem('token'));
+    if (userToken && userType) {
       navigate(`/${userType}Home`);
     }
-  }, [userType, navigate]);
+  }, [navigate]);
+  
 
   const handleClick = () => {
-    if(userType === 'admin')
-      navigate('/login', { state: { userType: 'admin' } });
-    else 
-      navigate('/login', { state: { userType: 'user' } });
+    // const userType = localStorage.getItem('UserType');
+    // if(userType === 'admin')
+      navigate('/login' );
+    // else 
+    //   navigate('/login');
   };
 
   return (

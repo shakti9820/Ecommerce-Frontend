@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CenteredContainer = styled.div`
@@ -47,27 +48,55 @@ const Button = styled.button`
 `;
 
 const Profile = () => {
+
+  const [userDetails,setUserDetails]=useState();
   const navigate = useNavigate();
-  const userData = JSON.parse(localStorage.getItem('user'));
+  const UserType = (localStorage.getItem('UserType'));
+
+
+
+  const findUserDetails=async()=>{
+    try {
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-details`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+     setUserDetails(response.data);
+     console.log(userDetails);
+    } catch (error) {
+      console.log('Error fetching products', error);
+    } 
+  };
+
+  useEffect(()=>{
+    findUserDetails();
+   
+  },[]);
+
 
   const goToHome = () => {
-    if (userData.userType === 'admin') {
+    if (UserType === 'admin') {
       navigate('/adminhome');
     } else {
       navigate('/userhome');
     }
   };
 
-  const { userType, name, username } = userData;
 
+  //  const {name,username}=userDetails;
+  //  console.log(username);
+  //  console.log(name);
   return (
     <CenteredContainer>
       <ProfileContainer>
         <ProfileHeading>User Profile</ProfileHeading>
-        <ProfileInfo>User Type: {userType}</ProfileInfo>
+        {/* <ProfileInfo>User Type: {UserType}</ProfileInfo>
         <ProfileInfo>Name: {name}</ProfileInfo>
         <ProfileInfo>Username: {username}</ProfileInfo>
-        <Button onClick={goToHome}>Go to Home</Button>
+        <Button onClick={goToHome}>Go to Home</Button> */}
       </ProfileContainer>
     </CenteredContainer>
   );

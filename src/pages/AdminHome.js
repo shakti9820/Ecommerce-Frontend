@@ -1,42 +1,65 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
 import AdminNavbar from '../Components/AdminNavbar';
 import ProductView from './ProductView';
-import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-// import backgroundImg from '../background.png'; 
+import { setProducts, setProductsLoading, setProductsError } from '../redux/action/productsAction'; // Adjust the imports based on your file structure
 
 const AdminHome = () => {
-  const navigate=useNavigate();
-  const [products, setProducts] = useState([]);
-
-  useEffect(()=>{
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if(!userData || userData.userType!=='admin'){
-      navigate("/");
-    }
-  },[])
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products.items);
+  const loading = useSelector((state) => state.products.loading);
+  const error = useSelector((state) => state.products.error);
 
   useEffect(() => {
-    // Fetch products from the server only once when the component mounts
-    axios.get(`${process.env.REACT_APP_API_URL}/products`)
-      .then(response => {
-        console.log(response.data);
-        setProducts(response.data); // Assuming response.data is an array of products
-      })
-      .catch(error => {
-        console.error('Error fetching products:', error);
+    const userData = JSON.parse(localStorage.getItem('token'));
+    const userType = localStorage.getItem('UserType');
+    if (!userData || userType !== 'admin') {
+      console.log('Redirecting to home from adminhome because user is not admin');
+      navigate('/');
+    }
+  }, [navigate]);
+
+  const fetchProducts = async () => {
+    dispatch(setProductsLoading(true));
+    try {
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/products`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
-  }, []); // Empty dependency array ensures this effect runs only once after the initial render
+      dispatch(setProducts(response.data));
+     
+    } catch (error) {
+      dispatch(setProductsError('Error fetching products'));
+    } finally {
+      dispatch(setProductsLoading(false));
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    console.log(products);
+  }, [dispatch]);
 
   return (
     <AdminHomeContainer>
       <AdminNavbar />
       <ProductList>
-        {products.map((product,index) => (
-          <ProductView key={index} product={product} />
-        ))}
+        {/* <h1>Hello Everyone</h1> */}
+        {loading && <p>Loading products...</p>}
+        {error && <p>Error fetching products: {error}</p>}
+        {products.length > 0 ? (
+          products.map((product, index) => (
+            <ProductView key={index} product={product} />
+          ))
+        ) : (
+          <p>No products available</p>
+        )}
       </ProductList>
     </AdminHomeContainer>
   );
@@ -48,7 +71,6 @@ const AdminHomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
- 
 `;
 
 const ProductList = styled.div`

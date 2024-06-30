@@ -63,15 +63,36 @@ const Button = styled.button`
 const Product = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
-  const userType = JSON.parse(localStorage.getItem('user')).userType;
-  const userId = JSON.parse(localStorage.getItem('user')).id;
+  const [userId, setUserId] = useState("");
+  const token = JSON.parse(localStorage.getItem('token')).jwt;
+  const userType = (localStorage.getItem('UserType'));
   const navigate = useNavigate();
+
+
+
+  const findUserId=async()=>{
+    try {
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-id`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+     setUserId(response.data);
+    } catch (error) {
+      console.log('Error fetching products');
+    } 
+  };
 
   useEffect(() => {
     // Fetch product data from the backend
-    axios.get(`${process.env.REACT_APP_API_URL}/products/${productId}`)
-      .then(response => {
-        console.log(response.data);
+    
+    axios.get(`${process.env.REACT_APP_API_URL}/products/${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }).then(response => {
+        // console.log(response.data);
         setProduct(response.data);
       })
       .catch(error => {
@@ -82,9 +103,16 @@ const Product = () => {
   const handleAddToCart = () => {
     // API call to add product to cart
 
-
+ 
     if (userType === 'user') {
-        axios.post(`${process.env.REACT_APP_API_URL}/user/add_to_cart?customerId=${userId}`, {
+      findUserId();
+        axios.post(`${process.env.REACT_APP_API_URL}/user/add_to_cart?customerId=${userId}`, 
+           {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          },
+          {
             //  product
             name:product.name,
             id:product.id,
@@ -100,23 +128,34 @@ const Product = () => {
             console.error('Error adding item to cart:', error);
           });
       } else {
-        alert('Only users can add products to cart. Please login as a user.');
+        alert('Only Customer can add products to cart. Please login as a Customer.');
       }
 
    
   };
-
-  const handleBuyNow = productId => {
+ 
+    const handleBuyNow = productId => {
     // Logic to handle buying the product
+    if (userType === 'user') {
+    findUserId();
     const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.post(`${process.env.REACT_APP_API_URL}/user/place_order?customerId=${userId}&productId=${productId}`)
+    axios.post(`${process.env.REACT_APP_API_URL}/user/place_order?customerId=${userId}&productId=${productId}` 
+      , {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       .then(res => {
         alert('Order Placed');
       })
       .catch(err => {
         console.error(err);
       });
-  };
+  }
+  else{
+    alert('Only Customer can buy products to cart. Please login as a Customer.');
+  }
+};
 
   if (!product) {
     return <div>Loading...</div>;

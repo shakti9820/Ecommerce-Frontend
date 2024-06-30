@@ -56,13 +56,17 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleAdminClick = () => {
-    setUserType('admin');
-    navigate('/login', { state: { userType: 'admin' } });
+    // setUserType('admin');
+    const type=localStorage.getItem('UserType');
+    if(!type)
+    localStorage.setItem('UserType', 'admin');
+    navigate('/login');
   };
 
   const handleCustomerClick = () => {
-    setUserType('user');
-    navigate('/login', { state: { userType: 'user' } });
+    // setUserType('user');
+    localStorage.setItem('UserType', 'user');
+    navigate('/login');
   };
 
   return (
