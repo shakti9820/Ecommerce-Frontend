@@ -48,34 +48,16 @@ const Button = styled.button`
 `;
 
 const Profile = () => {
-
-  const [userDetails,setUserDetails]=useState();
+  const [userDetails, setUserDetails] = useState({ name: '', username: '',id: '' });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const UserType = (localStorage.getItem('UserType'));
+  const UserType = localStorage.getItem('UserType');
 
-
-
-  const findUserDetails=async()=>{
-    try {
-      const token = JSON.parse(localStorage.getItem('token')).jwt;
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-details`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-     setUserDetails(response.data);
-     console.log(userDetails);
-    } catch (error) {
-      console.log('Error fetching products', error);
-    } 
-  };
-
-  useEffect(()=>{
-    findUserDetails();
-   
-  },[]);
-
+  const userDetail=JSON.parse(localStorage.getItem('user'));
+  if(userDetail){
+    setUserDetails(userDetail);
+    setLoading(false);
+    }
 
   const goToHome = () => {
     if (UserType === 'admin') {
@@ -85,18 +67,18 @@ const Profile = () => {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  //  const {name,username}=userDetails;
-  //  console.log(username);
-  //  console.log(name);
   return (
     <CenteredContainer>
       <ProfileContainer>
         <ProfileHeading>User Profile</ProfileHeading>
-        {/* <ProfileInfo>User Type: {UserType}</ProfileInfo>
-        <ProfileInfo>Name: {name}</ProfileInfo>
-        <ProfileInfo>Username: {username}</ProfileInfo>
-        <Button onClick={goToHome}>Go to Home</Button> */}
+        <ProfileInfo>User Type: {UserType}</ProfileInfo>
+        <ProfileInfo>Name: {userDetails.name}</ProfileInfo>
+        <ProfileInfo>Username: {userDetails.username}</ProfileInfo>
+        <Button onClick={goToHome}>Go to Home</Button>  
       </ProfileContainer>
     </CenteredContainer>
   );

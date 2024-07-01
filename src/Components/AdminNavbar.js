@@ -81,6 +81,8 @@ function AdminNavbar() {
   useEffect(()=>{
     if(!isLoggedIn){
       localStorage.removeItem('token');
+      localStorage.removeItem('UserType');
+      localStorage.removeItem('user');
     navigate('/');
     }
   },[isLoggedIn])

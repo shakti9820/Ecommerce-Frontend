@@ -46,7 +46,7 @@ function Signup() {
       .then(response => {
         console.log('Signup successful:', response.data);
         // Save user data to local storage
-        // localStorage.setItem('user', JSON.stringify({ ...response.data, userType }));
+        localStorage.setItem('user', JSON.stringify({ ...response.data}));
         // Redirect to user type home page
         // navigate(`/${userType}Home`);
         navigate('/login');

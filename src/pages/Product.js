@@ -63,26 +63,15 @@ const Button = styled.button`
 const Product = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
-  const [userId, setUserId] = useState("");
   const token = JSON.parse(localStorage.getItem('token')).jwt;
   const userType = (localStorage.getItem('UserType'));
   const navigate = useNavigate();
 
 
+  const userId = JSON.parse(localStorage.getItem('user')).id;
 
-  const findUserId=async()=>{
-    try {
-      const token = JSON.parse(localStorage.getItem('token')).jwt;
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-id`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-     setUserId(response.data);
-    } catch (error) {
-      console.log('Error fetching products');
-    } 
-  };
+
+  
 
   useEffect(() => {
     // Fetch product data from the backend
@@ -105,7 +94,6 @@ const Product = () => {
 
  
     if (userType === 'user') {
-      findUserId();
         axios.post(`${process.env.REACT_APP_API_URL}/user/add_to_cart?customerId=${userId}`, 
            {
             headers: {
@@ -137,8 +125,7 @@ const Product = () => {
     const handleBuyNow = productId => {
     // Logic to handle buying the product
     if (userType === 'user') {
-    findUserId();
-    const userId = JSON.parse(localStorage.getItem('user')).id;
+    
     axios.post(`${process.env.REACT_APP_API_URL}/user/place_order?customerId=${userId}&productId=${productId}` 
       , {
         headers: {

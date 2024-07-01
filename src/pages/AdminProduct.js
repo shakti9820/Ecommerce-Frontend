@@ -79,12 +79,40 @@ const Button = styled.button`
 const AdminProduct = () => {
   const [cartProducts, setCartProducts] = useState([]);
 
+  const token = JSON.parse(localStorage.getItem('token')).jwt;
+
+
+  const userId = JSON.parse(localStorage.getItem('user')).id;
+ 
+
+  const adminproducts=async()=>{
+    try {
+  
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+     const response=await axios.get(`${process.env.REACT_APP_API_URL}/admin/get_admin_products?adminId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setCartProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching cart products:', error);
+    }
+  };
+
+
   const handleDeleteProduct = productId => {
     // Logic to delete the product
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.delete(`${process.env.REACT_APP_API_URL}/admin/delete_admin_product?adminId=${userId}&productId=${productId}`)
+
+    axios.delete(`${process.env.REACT_APP_API_URL}/admin/delete_admin_product?adminId=${userId}&productId=${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
     .then(res=>{
        alert('Item deleted');
+       adminproducts();
     }).catch(err=>{
         console.error(err);
     });
@@ -94,15 +122,8 @@ const AdminProduct = () => {
 
   useEffect(() => {
     // Fetch cart products from the backend
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.get(`${process.env.REACT_APP_API_URL}/admin/get_admin_products?adminId=${userId}`)
-      .then(response => {
-        setCartProducts(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching cart products:', error);
-      });
-  }, [handleDeleteProduct]);
+    adminproducts();
+  }, []);
 
   
   return (

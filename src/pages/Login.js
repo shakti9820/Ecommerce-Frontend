@@ -13,12 +13,35 @@ function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+   
+
+  const findUserDetails = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-details`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      localStorage.setItem('user', JSON.stringify(response.data));
+      
+    } catch (error) {
+      console.log('Error fetching user details', error);
+      
+    }
+  };
+
+
+
 
   useEffect(() => {
     const userType = localStorage.getItem('UserType');
     const userToken = JSON.parse(localStorage.getItem('token'));
     if (userToken && userType) {
       navigate(`/${userType}Home`);
+    }
+    else if(!userType){
+      navigate('/');
     }
   }, [navigate]);
 
@@ -38,6 +61,7 @@ function Login() {
       });
       if (response.data) {
         localStorage.setItem('token', JSON.stringify(response.data));
+        findUserDetails();
         dispatch(loginSuccess(response.data));
         navigate(`/${userType}Home`);
       } else {
@@ -51,6 +75,9 @@ function Login() {
   const handleClick = () => {
     navigate('/register');
   };
+
+  // const token=JSON.parse(localStorage.getItem('token'));
+  // if(token) findUserDetails();
 
   return (
     <SignupContainer>

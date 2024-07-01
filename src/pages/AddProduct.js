@@ -76,7 +76,54 @@ const AddProduct = () => {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imgUrl, setImgUrl] = useState('');
+  const [adminId, setAdminId] = useState('');
   const [error, setError] = useState('');
+
+
+
+  const findUserId=async()=>{
+    try {
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-id`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setAdminId(response.data);
+    } catch (error) {
+      console.log('Error fetching products');
+    } 
+  };
+
+
+  const addproducts=async()=>{
+    try{
+      const token = JSON.parse(localStorage.getItem('token')).jwt;
+      const userType = localStorage.getItem('UserType');
+      if(adminId==='') findUserId();
+
+      const response=await axios
+      .post(`${process.env.REACT_APP_API_URL}/${userType}/addproduct`, {
+        name : productName,
+        highlights,
+        description,
+        price,
+        imageUrl:imgUrl,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Adminid' : `${adminId}`
+        }
+      }
+        );
+      navigate(`/${userType}Home`);
+
+    }
+    catch(error) {
+      console.error('Product addition failed:', error);
+      setError('Product addition failed. Please try again later.');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
@@ -89,32 +136,7 @@ const AddProduct = () => {
 
     // API call
    
-
-  // API call
-  const userData = JSON.parse(localStorage.getItem('user'));
-  const userType = userData.userType;
-  const adminId = userData.id;
-  axios
-    .post(`${process.env.REACT_APP_API_URL}/${userType}/addproduct`, {
-      name : productName,
-      highlights,
-      description,
-      price,
-      imageUrl:imgUrl,
-    }, {
-      params: {
-        adminId: adminId,
-      },
-    })
-      .then((response) => {
-        console.log('Product added successfully:', response.data);
-        // Redirect to user type home page
-        navigate(`/${userType}Home`);
-      })
-      .catch((error) => {
-        console.error('Product addition failed:', error);
-        setError('Product addition failed. Please try again later.');
-      });
+      addproducts();
   };
 
   const handleGoToHome = () => {
