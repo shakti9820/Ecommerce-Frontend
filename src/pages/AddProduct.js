@@ -80,19 +80,20 @@ const AddProduct = () => {
   const [error, setError] = useState('');
 
 
-
+  const userId=JSON.parse(localStorage.getItem("user")).id;
+  // setAdminId(userId);
   const findUserId=async()=>{
-    try {
-      const token = JSON.parse(localStorage.getItem('token')).jwt;
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-id`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setAdminId(response.data);
-    } catch (error) {
-      console.log('Error fetching products');
-    } 
+    // try {
+    //   const token = JSON.parse(localStorage.getItem('token')).jwt;
+    //   const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-id`, {
+    //     headers: {
+    //       'Authorization': `Bearer ${token}`
+    //     }
+    //   });
+    //   setAdminId(response.data);
+    // } catch (error) {
+    //   console.log('Error fetching products');
+    // } 
   };
 
 
@@ -100,7 +101,10 @@ const AddProduct = () => {
     try{
       const token = JSON.parse(localStorage.getItem('token')).jwt;
       const userType = localStorage.getItem('UserType');
-      if(adminId==='') findUserId();
+      if(adminId===''){
+        //  findUserId();
+         setAdminId(userId);
+      }
 
       const response=await axios
       .post(`${process.env.REACT_APP_API_URL}/${userType}/addproduct`, {
@@ -112,7 +116,7 @@ const AddProduct = () => {
       }, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Adminid' : `${adminId}`
+          'Adminid' : `${userId}`,
         }
       }
         );

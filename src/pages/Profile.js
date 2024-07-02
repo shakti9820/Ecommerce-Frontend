@@ -48,16 +48,22 @@ const Button = styled.button`
 `;
 
 const Profile = () => {
-  const [userDetails, setUserDetails] = useState({ name: '', username: '',id: '' });
-  const [loading, setLoading] = useState(true);
+  // const [userDetails, setUserDetails] = useState({ name: '', username: '',id: '' });
+  // const [loading, setLoading] = useState(true);
+  // const [name, setName] = useState("");
+  // const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const UserType = localStorage.getItem('UserType');
 
   const userDetail=JSON.parse(localStorage.getItem('user'));
+  const name=userDetail.name;
+  const username=userDetail.username;
+
   if(userDetail){
-    setUserDetails(userDetail);
-    setLoading(false);
-    }
+    // setName(userDetail.name);
+    // setUsername(userDetail.username);
+  // setLoading(true);
+  }
 
   const goToHome = () => {
     if (UserType === 'admin') {
@@ -67,20 +73,20 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  return (
+  // if (loading) {
+    // return <div>Loading...</div>;
+  // }
+   return (
+    // <h1>hello</h1>
     <CenteredContainer>
       <ProfileContainer>
         <ProfileHeading>User Profile</ProfileHeading>
         <ProfileInfo>User Type: {UserType}</ProfileInfo>
-        <ProfileInfo>Name: {userDetails.name}</ProfileInfo>
-        <ProfileInfo>Username: {userDetails.username}</ProfileInfo>
+        <ProfileInfo>Name: {name}</ProfileInfo>
+        <ProfileInfo>Username: {username}</ProfileInfo>
         <Button onClick={goToHome}>Go to Home</Button>  
-      </ProfileContainer>
-    </CenteredContainer>
+       </ProfileContainer>
+     </CenteredContainer>
   );
 };
 
