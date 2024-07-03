@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
+import SearchBar from './SearchBar';
 
 const Header = styled.div`
   position: fixed;
@@ -129,6 +130,7 @@ function AdminNavbar() {
       <Header>
         <NavbarContainer>
           <Brand>People Mart</Brand>
+         
           <NavMenu>
             <NavItem>
               <NavLink to="/adminhome">Home</NavLink>

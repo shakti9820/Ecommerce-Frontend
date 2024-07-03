@@ -72,7 +72,7 @@ const DropdownContent = styled.div`
   width: 150px; /* Set width */
 `;
 
-function UserNavbar({ setProducts }) {
+function UserNavbar() {
   const navigate=useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -81,8 +81,10 @@ function UserNavbar({ setProducts }) {
 
   useEffect(()=>{
     if(!isLoggedIn){
+      localStorage.removeItem('token');
+      localStorage.removeItem('UserType');
       localStorage.removeItem('user');
-      navigate('/');
+    navigate('/');
     }
   },[isLoggedIn])
 
@@ -99,12 +101,14 @@ function UserNavbar({ setProducts }) {
     };
   }, []);
 
+
   useEffect(() => {
-    const userData = (localStorage.getItem('UserType'));
-    if (!userData || userData.userType!=='user') {
+    const userData = JSON.parse(localStorage.getItem('token'));
+    const userType = (localStorage.getItem('UserType'));
+    if (!userData || userType!=='user') {
       navigate("/");
     }
-    if (userData==='user') {
+    else if (userType==='user') {
       setIsLoggedIn(true);
     }
   }, []);
@@ -124,7 +128,7 @@ function UserNavbar({ setProducts }) {
       <Header>
         <NavbarContainer>
           <Brand>People Mart</Brand>
-          <SearchBar setProducts={setProducts} /> {/* Include the SearchBar component */}
+         {/* Include the SearchBar component */}
           <NavMenu>
             <NavItem>
               <NavLink to="/userhome">Home</NavLink>

@@ -58,6 +58,7 @@ function Login() {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/${userType}/login`, {
         username: email,
         password,
+        role:userType,
       });
       if (response.data) {
         localStorage.setItem('token', JSON.stringify(response.data));

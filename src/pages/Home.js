@@ -58,14 +58,21 @@ const Home = () => {
   const handleAdminClick = () => {
     // setUserType('admin');
     const type=localStorage.getItem('UserType');
-    if(!type)
+    if(type!=="admin"){
+    localStorage.clear();
     localStorage.setItem('UserType', 'admin');
+    }
+    
     navigate('/login');
   };
 
   const handleCustomerClick = () => {
     // setUserType('user');
+    const type=localStorage.getItem('UserType');
+    if(type!=="user"){
+    localStorage.clear();
     localStorage.setItem('UserType', 'user');
+    }
     navigate('/login');
   };
 

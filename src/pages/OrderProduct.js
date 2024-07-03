@@ -79,19 +79,25 @@ const Button = styled.button`
 const OrderProduct = () => {
   const [orderProducts, setOrderProducts] = useState([]);
 
- 
+  const token = JSON.parse(localStorage.getItem('token')).jwt;
 
 
-  const fetchCartProducts=() => {
-    // Fetch cart products from the backend
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.get(`${process.env.REACT_APP_API_URL}/user/get_order_products?customerId=${userId}`)
-      .then(response => {
+  const userId = JSON.parse(localStorage.getItem('user')).id;
+
+
+  const fetchCartProducts=async() => {
+   try{
+    const response=await axios.get(`${process.env.REACT_APP_API_URL}/user/get_order_products?customerId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
+      
         setOrderProducts(response.data);
-      })
-      .catch(error => {
+      }catch(error) {
         console.error('Error fetching cart products:', error);
-      });
+      };
   };
 
   useEffect(() => {
@@ -100,8 +106,13 @@ const OrderProduct = () => {
 
   const handleDeleteProduct = productId => {
     // Logic to delete the product
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.delete(`${process.env.REACT_APP_API_URL}/user/delete_order_product?customerId=${userId}&productId=${productId}`)
+
+    axios.delete(`${process.env.REACT_APP_API_URL}/user/delete_order_product?customerId=${userId}&productId=${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
     .then(res=>{
        alert('Item deleted');
        fetchCartProducts();

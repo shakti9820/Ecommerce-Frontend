@@ -78,17 +78,24 @@ const Button = styled.button`
 
 const CartProduct = () => {
   const [cartProducts, setCartProducts] = useState([]);
+  const token = JSON.parse(localStorage.getItem('token')).jwt;
 
+
+  const userId = JSON.parse(localStorage.getItem('user')).id;
   
-  const fetchCartProducts = () => {
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.get(`${process.env.REACT_APP_API_URL}/user/get_cart_products?customerId=${userId}`)
-      .then(response => {
-        setCartProducts(response.data);
+  const fetchCartProducts = async() => {
+    try {
+
+    const response=await axios.get(`${process.env.REACT_APP_API_URL}/user/get_cart_products?customerId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       })
-      .catch(error => {
+      
+        setCartProducts(response.data);
+     } catch(error) {
         console.error('Error fetching cart products:', error);
-      });
+      };
   };
 
   useEffect(() => {
@@ -97,8 +104,12 @@ const CartProduct = () => {
 
   const handleDeleteProduct = productId => {
     // Logic to delete the product
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.delete(`${process.env.REACT_APP_API_URL}/user/delete_cart_product?customerId=${userId}&productId=${productId}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/user/delete_cart_product?customerId=${userId}&productId=${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
     .then(res=>{
        alert('Item deleted');
        fetchCartProducts();
@@ -110,8 +121,12 @@ const CartProduct = () => {
 
   const handleBuyNow = productId => {
     // Logic to handle buying the product
-    const userId = JSON.parse(localStorage.getItem('user')).id;
-    axios.delete(`${process.env.REACT_APP_API_URL}/user/cart_to_order?customerId=${userId}&productId=${productId}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/user/cart_to_order?customerId=${userId}&productId=${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
     .then(res=>{
        alert('Item added to order'+res.data);
        fetchCartProducts();

@@ -89,17 +89,13 @@ const Product = () => {
       });
   }, [productId]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async() => {
     // API call to add product to cart
 
  
     if (userType === 'user') {
-        axios.post(`${process.env.REACT_APP_API_URL}/user/add_to_cart?customerId=${userId}`, 
-           {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          },
+      try{
+        const response=await axios.post(`${process.env.REACT_APP_API_URL}/user/add_to_cart?customerId=${userId}`, 
           {
             //  product
             name:product.name,
@@ -107,14 +103,20 @@ const Product = () => {
             highlights:product.highlights,
             description:product.description,
             price:product.price
-          })
-          .then(response => {
+          }, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Adminid' : `${userId}`,
+            }
+          }
+        
+        );
+          
             alert('Item added to cart');
             navigate('/userHome');
-          })
-          .catch(error => {
+          }catch(error) {
             console.error('Error adding item to cart:', error);
-          });
+          };
       } else {
         alert('Only Customer can add products to cart. Please login as a Customer.');
       }
