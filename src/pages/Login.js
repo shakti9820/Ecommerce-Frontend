@@ -17,8 +17,9 @@ function Login() {
 
   const findUserDetails = async () => {
     try {
+      const userType = localStorage.getItem('UserType');
       const token = JSON.parse(localStorage.getItem('token')).jwt;
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-details`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/${userType}/user-details`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
